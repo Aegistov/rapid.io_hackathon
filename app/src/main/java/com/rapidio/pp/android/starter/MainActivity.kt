@@ -37,7 +37,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
         Timber.plant(DebugTree())
 
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_test)
         ButterKnife.bind(this)
         requestPermissions()
         val mapFragment = fragmentManager
