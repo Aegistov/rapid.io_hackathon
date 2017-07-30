@@ -64,6 +64,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         Rapid.getInstance().collection("userLocations")
                 .subscribe({ test ->
                     Log.d("rapid subscribe", "response gotten")
+                    map.clear()
                     test.forEach { location ->
                         Log.d("rapid subscribe", "testing location object")
                         Log.d("rapid subscribe", location.body.toString())
