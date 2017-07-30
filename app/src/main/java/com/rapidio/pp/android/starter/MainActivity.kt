@@ -45,7 +45,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     var settingRallyPoint = false
     var locationPoints: MutableList<LocationEntity> = mutableListOf()
     var rallyPoints: MutableList<LocationEntity> = mutableListOf()
-    lateinit var map: GoogleMap
+    var map: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,9 +135,9 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun redraw() {
-        map.clear()
+        map?.clear()
         rallyPoints.forEach { location ->
-            map.addMarker(MarkerOptions()
+            map?.addMarker(MarkerOptions()
                     .position(LatLng(
                             location.latitude,
                             location.longitude))
@@ -146,7 +146,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         }
 
         locationPoints.forEach { location ->
-            map.addMarker(MarkerOptions()
+            map?.addMarker(MarkerOptions()
                     .position(LatLng(
                             location.latitude,
                             location.longitude))
@@ -239,13 +239,4 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         val myToast = Toast.makeText(this, "Location pushed to party members!", Toast.LENGTH_SHORT)
         myToast.show()
     }
-
-    fun startScreen(view: View) {
-            val startIntent = Intent(this, SyncMember::class.java)
-
-//    adventureIntent.putExtra(SyncMember.TOTAL_COUNT, count)
-
-            startActivity(startIntent)
-    }
-
 }
