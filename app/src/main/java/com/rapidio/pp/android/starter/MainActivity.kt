@@ -162,7 +162,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun startScreen(view: View) {
-            val startIntent = Intent(this, SyncMember::class.java)
+            val startIntent = Intent(this, SyncMain::class.java)
 
 //    adventureIntent.putExtra(SyncMember.TOTAL_COUNT, count)
 
