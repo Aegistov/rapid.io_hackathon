@@ -42,7 +42,7 @@
         android:id="@+id/imageView"
         android:layout_width="229dp"
         android:layout_height="206dp"
-        app:srcCompat="@drawable/anon_user"
+        app:srcCompat="@drawable/sandra"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
