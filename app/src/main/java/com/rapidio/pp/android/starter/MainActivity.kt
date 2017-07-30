@@ -11,10 +11,12 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.telephony.TelephonyManager
+import android.transition.Visibility
 import android.util.Log
 import android.widget.Button
 import butterknife.BindView
 import android.view.View
+import android.widget.TextView
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.GoogleMap
@@ -34,6 +36,7 @@ import io.reactivex.disposables.Disposable
 class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     @BindView(R.id.button6) lateinit var rallyPointButton: Button
+    @BindView(R.id.setting_rally_point) lateinit var rallyPointText: TextView
 
     var rxLocation: RxLocation? = null
     var documentId: String = "no_phone"
@@ -53,7 +56,14 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         val mapFragment = fragmentManager
                 .findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync(this)
-        rallyPointButton.setOnClickListener { settingRallyPoint = true }
+        rallyPointButton.setOnClickListener {
+            settingRallyPoint = !settingRallyPoint
+            rallyPointText.visibility = when (settingRallyPoint) {
+                true -> View.VISIBLE
+                false -> View.GONE
+            }
+
+        }
 
     }
 
@@ -80,6 +90,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
                     .onSuccess { Log.d("rapidio rallyPoint", "Success") }
                     .onError { error -> error.printStackTrace() }
             settingRallyPoint = false
+            rallyPointText.visibility = View.GONE
         }
     }
 

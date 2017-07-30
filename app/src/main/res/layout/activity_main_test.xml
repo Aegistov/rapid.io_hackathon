@@ -51,4 +51,17 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp" />
 
+    <TextView
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/setting_rally_point"
+      android:textSize="32sp"
+      android:text="Setting Rally Point"
+      android:gravity="center"
+      android:includeFontPadding="false"
+      android:textColor="@color/colorAccent"
+      app:layout_constraintBottom_toBottomOf="@id/map"
+      android:visibility="gone"
+      />
+
 </android.support.constraint.ConstraintLayout>
