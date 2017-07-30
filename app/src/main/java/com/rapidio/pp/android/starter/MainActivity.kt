@@ -2,11 +2,14 @@ package com.rapidio.pp.android.starter
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     @BindView(R.id.pp_button_1) lateinit var button1: Button
 
     var rxLocation: RxLocation? = null
+    lateinit var collectionName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,10 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
-        subscribeToRapid()
-        button1.setOnClickListener { testAddItem() }
-        rxLocation = RxLocation(this)
-        requestLocationPermissions()
+        requestPermissions()
     }
 
     override fun onStop() {
@@ -46,20 +47,27 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    fun testAddItem() {
-        val newDocument = Rapid.getInstance().collection("tests", TestEntity::class.java).newDocument()
-        newDocument.mutate(TestEntity(newDocument.id, "hello_world_2", 1))
+    fun addLocation(loc: Location) {
+        val newDocument = Rapid.getInstance().collection(collectionName, LocationEntity::class.java).newDocument()
+        newDocument.mutate(LocationEntity(newDocument.id, loc.longitude, loc.latitude))
     }
 
     fun subscribeToRapid() {
-        Rapid.getInstance().collection("tests")
+        Rapid.getInstance().collection(collectionName)
                 .subscribe({ test ->
                     Log.d("rapidio test", test.toString())
                 })
     }
 
-    fun requestLocationPermissions() {
-        val neededPermissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    fun addCollectionNameToRapid() {
+        Rapid.getInstance().collection<UserEntity>("users", UserEntity::class.java).document(collectionName)
+                .mutate(UserEntity(collectionName))
+                .onSuccess { Log.d("rapidio mutate", "Success") }
+                .onError { error -> error.printStackTrace() }
+    }
+
+    fun requestPermissions() {
+        val neededPermissions = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE)
         var hasAllPermissions = true
         neededPermissions.forEach { permission ->
             if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -76,15 +84,20 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("MissingPermission")
     private fun onLocationPermissionGranted() {
+        rxLocation = RxLocation(this)
+        @SuppressLint("MissingPermission", "HardwareIds")
+        collectionName = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId
+        addCollectionNameToRapid()
+        subscribeToRapid()
         val locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(1000)
+                .setInterval(10000)
 
         rxLocation?.let {
             it.location().updates(locationRequest)
-                    .flatMap { location -> it.geocoding().fromLocation(location).toObservable() }
                     .subscribe({
                         Log.d("locations", "ayyy")
+                        addLocation(it)
                     })
         }
     }
@@ -96,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty()) {
                     onLocationPermissionGranted()
                 } else {
-                    requestLocationPermissions()
+                    requestPermissions()
                 }
                 return
             }
