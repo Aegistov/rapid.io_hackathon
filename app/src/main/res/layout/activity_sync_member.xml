@@ -5,6 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#00838f"
     tools:context="com.rapidio.pp.android.starter.SyncMember">
 
     <android.support.design.widget.BottomNavigationView
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="0dp"
         android:layout_marginStart="0dp"
-        android:background="?android:attr/windowBackground"
+        android:background="#4fb3bf"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -35,15 +36,18 @@
         android:id="@+id/textView"
         android:layout_width="296dp"
         android:layout_height="47dp"
-        android:text="Display Name"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/quickContactBadge"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/navigation"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Display Name"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/quickContactBadge" />
 
     <Button
         android:id="@+id/button3"
