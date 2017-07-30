@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_sync_member.*
 
 class SyncMember : AppCompatActivity() {
@@ -11,7 +12,8 @@ class SyncMember : AppCompatActivity() {
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_create -> {
-//                message.setText(R.string.create_party)
+                val myToast = Toast.makeText(this, "Party Created!", Toast.LENGTH_SHORT)
+                myToast.show()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_ready -> {
