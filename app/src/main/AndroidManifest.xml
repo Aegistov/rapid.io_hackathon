@@ -16,7 +16,7 @@
 
     <meta-data
       android:name="io.rapid.apikey"
-      android:value="cmVhMTEucmFwaWQuaW8=" />
+      android:value="NDA1OWE0MWo1b3AzYXk0LnJhcGlkLmlv" />
     
     <activity android:name=".MainActivity">
       <intent-filter>
