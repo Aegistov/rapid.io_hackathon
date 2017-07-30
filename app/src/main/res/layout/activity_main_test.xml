@@ -26,29 +26,31 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
-        android:layout_height="307dp"
+        android:layout_height="241dp"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="48dp" />
+        tools:layout_editor_absoluteY="74dp" />
 
     <Button
         android:id="@+id/button5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Disband Party"
-        tools:layout_editor_absoluteY="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="8dp"
         app:layout_constraintStart_toEndOf="@+id/button6"
         android:layout_marginStart="8dp"
-        app:layout_constraintHorizontal_bias="0.91" />
+        app:layout_constraintHorizontal_bias="0.91"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/map" />
 
     <Button
         android:id="@+id/button6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set Rally Point"
-        tools:layout_editor_absoluteY="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="8dp" />
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/map" />
 
 </android.support.constraint.ConstraintLayout>
