@@ -40,7 +40,9 @@
         <activity
             android:name=".SyncMember"
             android:label="@string/title_activity_sync_member"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".JoinParty" />
+        <activity android:name=".CreateParty"></activity>
     </application>
 
 </manifest>
