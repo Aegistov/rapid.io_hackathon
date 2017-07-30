@@ -16,6 +16,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.patloew.rxlocation.RxLocation
@@ -72,7 +73,8 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
                                     .position(LatLng(
                                             location.body["latitude"] as Double,
                                             location.body["longitude"] as Double))
-                                    .title(location.id))
+                                    .title(location.id)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.check)))
                         }
                     }
                 })
