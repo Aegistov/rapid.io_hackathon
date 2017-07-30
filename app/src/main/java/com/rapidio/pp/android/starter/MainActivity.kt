@@ -31,7 +31,6 @@ import com.patloew.rxlocation.RxLocation
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import io.rapid.Rapid
-import io.rapid.RapidDocument
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 
@@ -39,6 +38,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     @BindView(R.id.button6) lateinit var rallyPointButton: Button
     @BindView(R.id.setting_rally_point) lateinit var rallyPointText: TextView
+    @BindView(R.id.button5) lateinit var joinParty: Button
 
     var rxLocation: RxLocation? = null
     var documentId: String = "no_phone"
@@ -58,6 +58,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         val mapFragment = fragmentManager
                 .findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync(this)
+        joinParty.setOnClickListener { goToPartyActivity() }
         rallyPointButton.setOnClickListener {
             settingRallyPoint = !settingRallyPoint
             rallyPointText.visibility = when (settingRallyPoint) {
@@ -229,6 +230,11 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         this.map = map
         map.setOnMapClickListener { addRallyPoint(it) }
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(37.7737387,-122.4197341) , 14.0f) )
+    }
+
+    fun goToPartyActivity() {
+        val startIntent = Intent(this, SyncMember::class.java)
+        startActivity(startIntent)
     }
 
     companion object {
