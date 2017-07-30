@@ -3,6 +3,7 @@ package com.rapidio.pp.android.starter
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.telephony.TelephonyManager
 import android.util.Log
+import android.view.View
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.GoogleMap
@@ -25,6 +27,7 @@ import timber.log.Timber.DebugTree
 import io.rapid.Rapid
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_sync_member.*
 
 class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
@@ -157,4 +160,13 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     companion object {
         val MY_PERMISSIONS_REQUEST_CALLBACK = 1234
     }
+
+    fun startScreen(view: View) {
+            val startIntent = Intent(this, SyncMember::class.java)
+
+//    adventureIntent.putExtra(SyncMember.TOTAL_COUNT, count)
+
+            startActivity(startIntent)
+    }
+
 }

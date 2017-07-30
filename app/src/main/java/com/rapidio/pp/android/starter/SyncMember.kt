@@ -1,8 +1,11 @@
 package com.rapidio.pp.android.starter
 
+import android.content.Intent
+import android.databinding.DataBindingUtil.setContentView
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import kotlinx.android.synthetic.main.activity_sync_member.*
 
 class SyncMember : AppCompatActivity() {
