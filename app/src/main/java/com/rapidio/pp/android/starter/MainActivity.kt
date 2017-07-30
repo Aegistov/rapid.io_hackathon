@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     @BindView(R.id.pp_button_1) lateinit var button1: Button
 
     var rxLocation: RxLocation? = null
-    lateinit var collectionName: String
+    var collectionName: String = "no_phone"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
     private fun onLocationPermissionGranted() {
         rxLocation = RxLocation(this)
         @SuppressLint("MissingPermission", "HardwareIds")
-        collectionName = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId
+        collectionName = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
         addCollectionNameToRapid()
         subscribeToRapid()
         val locationRequest = LocationRequest.create()
