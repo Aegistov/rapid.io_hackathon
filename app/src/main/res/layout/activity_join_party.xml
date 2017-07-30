@@ -13,8 +13,12 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Party Name"
-        tools:layout_editor_absoluteX="85dp"
-        tools:layout_editor_absoluteY="201dp" />
+        android:layout_marginBottom="28dp"
+        app:layout_constraintBottom_toTopOf="@+id/editText2"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <EditText
         android:id="@+id/editText2"
@@ -22,8 +26,10 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPassword"
-        tools:layout_editor_absoluteX="84dp"
-        tools:layout_editor_absoluteY="278dp" />
+        android:layout_marginBottom="132dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -31,6 +37,12 @@
         android:layout_height="89dp"
         android:text="Join Party"
         android:textSize="48sp"
-        tools:layout_editor_absoluteX="77dp"
-        tools:layout_editor_absoluteY="65dp" />
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/editText"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp" />
 </android.support.constraint.ConstraintLayout>
