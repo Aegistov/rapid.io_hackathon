@@ -20,6 +20,8 @@ import com.patloew.rxlocation.RxLocation
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import io.rapid.Rapid
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         newDocument.mutate(LocationEntity(newDocument.id, loc.longitude, loc.latitude))
     }
 
-    fun subscribeToRapid() {
-        Rapid.getInstance().collection(collectionName)
+    fun subscribeToRapid(collection: String) {
+        Rapid.getInstance().collection(collection)
                 .subscribe({ test ->
                     Log.d("rapidio test", test.toString())
                 })
@@ -88,16 +90,29 @@ class MainActivity : AppCompatActivity() {
         @SuppressLint("MissingPermission", "HardwareIds")
         collectionName = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
         addCollectionNameToRapid()
-        subscribeToRapid()
+        subscribeToRapid(collectionName)
         val locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10000)
 
         rxLocation?.let {
             it.location().updates(locationRequest)
-                    .subscribe({
-                        Log.d("locations", "ayyy")
-                        addLocation(it)
+                    .subscribe(object : Observer<Location> {
+                        override fun onError(p0: Throwable) {
+                            Timber.d(p0)
+                        }
+
+                        override fun onComplete() {
+                        }
+
+                        override fun onSubscribe(p0: Disposable) {
+                        }
+
+                        override fun onNext(p0: Location) {
+                            Log.d("locations", "ayyy")
+                            addLocation(p0)
+                        }
+
                     })
         }
     }
