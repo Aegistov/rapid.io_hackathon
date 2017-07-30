@@ -12,6 +12,7 @@ class SyncMember : AppCompatActivity() {
         when (item.itemId) {
             R.id.navigation_create -> {
 //                message.setText(R.string.create_party)
+                transitionToCreate()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_ready -> {
@@ -21,6 +22,7 @@ class SyncMember : AppCompatActivity() {
             }
             R.id.navigation_join -> {
 //                message.setText(R.string.join_party)
+                transitionToJoin()
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -36,6 +38,16 @@ class SyncMember : AppCompatActivity() {
 
     fun transitionToMain() {
         val startIntent = Intent(this, MainActivity::class.java)
+        startActivity(startIntent)
+    }
+
+    fun transitionToJoin(){
+        val startIntent = Intent(this, JoinParty::class.java)
+        startActivity(startIntent)
+    }
+
+    fun transitionToCreate(){
+        val startIntent = Intent(this, CreateParty::class.java)
         startActivity(startIntent)
     }
 }
