@@ -16,7 +16,7 @@
         app:layout_constraintTop_toBottomOf="@+id/map"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:onClick="startScreen"
+        android:onClick="toastMe"
         />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

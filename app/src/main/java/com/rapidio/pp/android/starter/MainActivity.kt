@@ -17,6 +17,7 @@ import android.widget.Button
 import butterknife.BindView
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -232,6 +233,11 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     companion object {
         val MY_PERMISSIONS_REQUEST_CALLBACK = 1234
+    }
+
+    fun toastMe(view: View) {
+        val myToast = Toast.makeText(this, "Location pushed to party members!", Toast.LENGTH_SHORT)
+        myToast.show()
     }
 
     fun startScreen(view: View) {
