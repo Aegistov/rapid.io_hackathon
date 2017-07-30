@@ -7,15 +7,17 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
-import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapFragment
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.patloew.rxlocation.RxLocation
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -23,13 +25,11 @@ import io.rapid.Rapid
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 
-class MainActivity : AppCompatActivity() {
-
-    @BindView(R.id.pp_text_1) lateinit var textView1: TextView
-    @BindView(R.id.pp_button_1) lateinit var button1: Button
+class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     var rxLocation: RxLocation? = null
-    var collectionName: String = "no_phone"
+    var documentId: String = "no_phone"
+    lateinit var map: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +39,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
         requestPermissions()
+        val mapFragment = fragmentManager
+                .findFragmentById(R.id.map) as MapFragment
+        mapFragment.getMapAsync(this)
     }
 
     override fun onStop() {
@@ -50,20 +53,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun addLocation(loc: Location) {
-        val newDocument = Rapid.getInstance().collection(collectionName, LocationEntity::class.java).newDocument()
-        newDocument.mutate(LocationEntity(newDocument.id, loc.longitude, loc.latitude))
+        Rapid.getInstance().collection<LocationEntity>("userLocations", LocationEntity::class.java).document(documentId)
+                .mutate(LocationEntity(documentId, loc.longitude, loc.latitude))
+                .onSuccess { Log.d("rapidio mutate location", "Success") }
+                .onError { error -> error.printStackTrace() }
     }
 
-    fun subscribeToRapid(collection: String) {
-        Rapid.getInstance().collection(collection)
+    fun subscribeToRapid() {
+        Rapid.getInstance().collection("userLocations")
                 .subscribe({ test ->
-                    Log.d("rapidio test", test.toString())
+                    Log.d("rapid subscribe", "response gotten")
+                    test.forEach { location ->
+                        Log.d("rapid subscribe", "testing location object")
+                        Log.d("rapid subscribe", location.body.toString())
+                        if (location.body.containsKey("latitude") && location.body.containsKey("longitude")) {
+                            Log.d("rapid subscribe", "object is good")
+                            map.addMarker(MarkerOptions()
+                                    .position(LatLng(
+                                            location.body["latitude"] as Double,
+                                            location.body["longitude"] as Double))
+                                    .title(location.id))
+                        }
+                    }
                 })
     }
 
     fun addCollectionNameToRapid() {
-        Rapid.getInstance().collection<UserEntity>("users", UserEntity::class.java).document(collectionName)
-                .mutate(UserEntity(collectionName))
+        Rapid.getInstance().collection<UserEntity>("users", UserEntity::class.java).document(documentId)
+                .mutate(UserEntity(documentId))
                 .onSuccess { Log.d("rapidio mutate", "Success") }
                 .onError { error -> error.printStackTrace() }
     }
@@ -87,10 +104,10 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun onLocationPermissionGranted() {
         rxLocation = RxLocation(this)
-        @SuppressLint("MissingPermission", "HardwareIds")
-        collectionName = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
+        @SuppressLint("HardwareIds")
+        documentId = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
         addCollectionNameToRapid()
-        subscribeToRapid(collectionName)
+        subscribeToRapid()
         val locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10000)
@@ -112,7 +129,6 @@ class MainActivity : AppCompatActivity() {
                             Log.d("locations", "ayyy")
                             addLocation(p0)
                         }
-
                     })
         }
     }
@@ -129,6 +145,10 @@ class MainActivity : AppCompatActivity() {
                 return
             }
         }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        this.map = map
     }
 
     companion object {
