@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
-apply plugin: 'me.tatarka.retrolambda'
 
 
 buildscript {
@@ -10,7 +9,6 @@ buildscript {
         repositories {
             jcenter()
         }
-        classpath 'me.tatarka:gradle-retrolambda:3.6.1'
     }
 }
 
@@ -31,10 +29,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
     }
     dataBinding {
         enabled = true
