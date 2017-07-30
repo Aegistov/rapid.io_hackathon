@@ -44,7 +44,8 @@
         app:layout_constraintHorizontal_bias="0.91"
         android:layout_marginBottom="8dp"
         app:layout_constraintTop_toTopOf="@+id/map"
-        tools:layout_editor_absoluteX="186dp" />
+        tools:layout_editor_absoluteX="186dp"
+        android:layout_marginTop="10dp" />
 
     <Button
         android:id="@+id/button6"
@@ -58,7 +59,8 @@
         android:textSize="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/map"
-        tools:layout_editor_absoluteX="20dp" />
+        tools:layout_editor_absoluteX="20dp"
+        android:layout_marginTop="10dp" />
 
     <TextView
       android:layout_width="fill_parent"
