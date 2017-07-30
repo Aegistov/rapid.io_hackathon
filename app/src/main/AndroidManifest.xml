@@ -28,7 +28,9 @@
             android:name="io.rapid.apikey"
             android:value="NDA1OWE0MWo1b3AzYXk0LnJhcGlkLmlv" />
 
-        <activity android:name=".MainActivity">
+        <activity
+          android:name=".MainActivity"
+          android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

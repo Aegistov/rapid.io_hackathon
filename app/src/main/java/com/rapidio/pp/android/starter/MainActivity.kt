@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.TextView
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -226,6 +227,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         this.map = map
         map.setOnMapClickListener { addRallyPoint(it) }
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(37.7737387,-122.4197341) , 14.0f) )
     }
 
     companion object {
