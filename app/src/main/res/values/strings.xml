@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Android Starter app</string>
+    <string name="app_name">GrupHudl</string>
     <string name="title_activity_sync_member">SyncMember</string>
     <string name="create_party">Create Party</string>
     <string name="ready_up">Ready!</string>

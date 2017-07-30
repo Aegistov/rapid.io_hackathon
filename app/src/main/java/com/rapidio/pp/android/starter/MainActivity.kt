@@ -34,6 +34,15 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     var rxLocation: RxLocation? = null
     var documentId: String = "no_phone"
     lateinit var map: GoogleMap
+    var isPermissionGranted: Boolean = false
+        set(value) {
+            try {
+                onMapReady(map)
+
+            } catch (e: UninitializedPropertyAccessException) {
+                print("Map not loading...")
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,34 +118,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun onLocationPermissionGranted() {
-        rxLocation = RxLocation(this)
-        @SuppressLint("HardwareIds")
-        documentId = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
-        addCollectionNameToRapid()
-        subscribeToRapid()
-        val locationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10000)
-
-        rxLocation?.let {
-            it.location().updates(locationRequest)
-                    .subscribe(object : Observer<Location> {
-                        override fun onError(p0: Throwable) {
-                            Timber.d(p0)
-                        }
-
-                        override fun onComplete() {
-                        }
-
-                        override fun onSubscribe(p0: Disposable) {
-                        }
-
-                        override fun onNext(p0: Location) {
-                            Log.d("locations", "ayyy")
-                            addLocation(p0)
-                        }
-                    })
-        }
+        isPermissionGranted = true
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -153,8 +135,40 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(map: GoogleMap) {
         this.map = map
+
+        if (isPermissionGranted){
+            rxLocation = RxLocation(this)
+            @SuppressLint("HardwareIds")
+            documentId = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
+            addCollectionNameToRapid()
+            subscribeToRapid()
+            val locationRequest = LocationRequest.create()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(10000)
+
+            rxLocation?.let {
+                it.location().updates(locationRequest)
+                        .subscribe(object : Observer<Location> {
+                            override fun onError(p0: Throwable) {
+                                Timber.d(p0)
+                            }
+
+                            override fun onComplete() {
+                            }
+
+                            override fun onSubscribe(p0: Disposable) {
+                            }
+
+                            override fun onNext(p0: Location) {
+                                Log.d("locations", "ayyy")
+                                addLocation(p0)
+                            }
+                        })
+            }
+        }
     }
 
     companion object {
