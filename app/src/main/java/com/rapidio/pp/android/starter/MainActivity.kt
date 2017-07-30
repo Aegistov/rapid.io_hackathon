@@ -2,20 +2,20 @@ package com.rapidio.pp.android.starter
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.rapidio.pp.android.starter.network.NetworkService
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import io.rapid.Rapid
 
 class MainActivity : AppCompatActivity() {
 
-    @BindView(R.id.pp_text_1) internal var textView1: TextView? = null
+    @BindView(R.id.pp_text_1) lateinit var textView1: TextView
+    @BindView(R.id.pp_button_1) lateinit var button1: Button
 
     internal var cd = CompositeDisposable()
 
@@ -26,8 +26,8 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
-
-        loadData()
+        subscribeToRapid()
+        button1.setOnClickListener { testAddItem() }
     }
 
     override fun onDestroy() {
@@ -35,14 +35,16 @@ class MainActivity : AppCompatActivity() {
         cd.clear()
     }
 
-    private fun loadData() {
-        textView1?.text = "Hello World (local)"
-
-        val disposable = NetworkService().api.hello()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ response -> Timber.d("result %s", response) }) { throwable -> Timber.e(throwable, "ruh roh, something went wrong!") }
-
-        cd.add(disposable)
+    fun testAddItem() {
+        val newDocument = Rapid.getInstance().collection("tests", TestEntity::class.java).newDocument()
+        newDocument.mutate(TestEntity(newDocument.id, "hello_world_2", 1))
     }
+
+    fun subscribeToRapid() {
+        Rapid.getInstance().collection("tests")
+                .subscribe({ test ->
+                    Log.d("rapidio test", test.toString())
+                })
+    }
+
 }
