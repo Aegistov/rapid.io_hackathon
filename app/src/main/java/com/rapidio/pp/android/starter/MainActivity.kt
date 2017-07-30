@@ -27,16 +27,19 @@ import com.patloew.rxlocation.RxLocation
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import io.rapid.Rapid
+import io.rapid.RapidDocument
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 
-class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
+class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     @BindView(R.id.button6) lateinit var rallyPointButton: Button
 
     var rxLocation: RxLocation? = null
     var documentId: String = "no_phone"
     var settingRallyPoint = false
+    var locationPoints: MutableList<LocationEntity> = mutableListOf()
+    var rallyPoints: MutableList<LocationEntity> = mutableListOf()
     lateinit var map: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +53,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         val mapFragment = fragmentManager
                 .findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync(this)
-        rallyPointButton.setOnClickListener {
-            Log.d("rally", "button pressed")
-            settingRallyPoint = true
-        }
+        rallyPointButton.setOnClickListener { settingRallyPoint = true }
 
     }
 
@@ -67,37 +67,38 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     fun addLocation(loc: Location) {
         Rapid.getInstance().collection<LocationEntity>("userLocations", LocationEntity::class.java).document(documentId)
-                .mutate(LocationEntity(documentId, loc.longitude, loc.latitude))
+                .mutate(LocationEntity(documentId, loc.latitude, loc.longitude))
                 .onSuccess { Log.d("rapidio mutate location", "Success") }
                 .onError { error -> error.printStackTrace() }
     }
 
 
     fun addRallyPoint(loc: LatLng) {
-        Rapid.getInstance().collection<LocationEntity>("rallyPoints", LocationEntity::class.java).document(documentId)
-                .mutate(LocationEntity(documentId, loc.longitude, loc.latitude))
-                .onSuccess { Log.d("rapidio rallyPoint", "Success") }
-                .onError { error -> error.printStackTrace() }
+        if (settingRallyPoint) {
+            Rapid.getInstance().collection<LocationEntity>("rallyPoints", LocationEntity::class.java).document(documentId)
+                    .mutate(LocationEntity(documentId, loc.latitude, loc.longitude))
+                    .onSuccess { Log.d("rapidio rallyPoint", "Success") }
+                    .onError { error -> error.printStackTrace() }
+            settingRallyPoint = false
+        }
     }
 
     fun subscribeToLocations() {
         Rapid.getInstance().collection("userLocations")
                 .subscribe({ test ->
                     Log.d("rapid subscribe", "response gotten")
-                    map.clear()
+                    locationPoints.removeAll { true }
                     test.forEach { location ->
                         Log.d("rapid subscribe", "testing location object")
                         Log.d("rapid subscribe", location.body.toString())
                         if (location.body.containsKey("latitude") && location.body.containsKey("longitude")) {
                             Log.d("rapid subscribe", "object is good")
-                            map.addMarker(MarkerOptions()
-                                    .position(LatLng(
-                                            location.body["latitude"] as Double,
-                                            location.body["longitude"] as Double))
-                                    .title(location.id)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.check)))
+                            locationPoints.add(LocationEntity(location.id,
+                                    location.body["latitude"] as Double,
+                                    location.body["longitude"] as Double))
                         }
                     }
+                    redraw()
                 })
     }
 
@@ -105,21 +106,40 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
         Rapid.getInstance().collection("rallyPoints")
                 .subscribe({ test ->
                     Log.d("rapid subscribe", "response gotten")
-                    map.clear()
+                    rallyPoints.removeAll { true }
                     test.forEach { location ->
                         Log.d("rapid subscribe", "testing location object")
                         Log.d("rapid subscribe", location.body.toString())
                         if (location.body.containsKey("latitude") && location.body.containsKey("longitude")) {
                             Log.d("rapid subscribe", "object is good")
-                            map.addMarker(MarkerOptions()
-                                    .position(LatLng(
-                                            location.body["latitude"] as Double,
-                                            location.body["longitude"] as Double))
-                                    .title(location.id)
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)))
+                            rallyPoints.add(LocationEntity(location.id,
+                                    location.body["latitude"] as Double,
+                                    location.body["longitude"] as Double))
                         }
                     }
+                    redraw()
                 })
+    }
+
+    fun redraw() {
+        map.clear()
+        rallyPoints.forEach { location ->
+            map.addMarker(MarkerOptions()
+                    .position(LatLng(
+                            location.latitude,
+                            location.longitude))
+                    .title(location.id)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)))
+        }
+
+        locationPoints.forEach { location ->
+            map.addMarker(MarkerOptions()
+                    .position(LatLng(
+                            location.latitude,
+                            location.longitude))
+                    .title(location.id)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.check)))
+        }
     }
 
     fun addCollectionNameToRapid() {
@@ -194,15 +214,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClic
 
     override fun onMapReady(map: GoogleMap) {
         this.map = map
-    }
-
-    override fun onMapClick(point: LatLng) {
-        Log.d("rally", "setting")
-        if (settingRallyPoint) {
-            Log.d("rally", "setting true")
-            addRallyPoint(point)
-            settingRallyPoint = false
-        }
+        map.setOnMapClickListener { addRallyPoint(it) }
     }
 
     companion object {
