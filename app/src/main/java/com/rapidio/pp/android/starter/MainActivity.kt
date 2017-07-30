@@ -12,6 +12,8 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.telephony.TelephonyManager
 import android.util.Log
+import android.widget.Button
+import butterknife.BindView
 import android.view.View
 import butterknife.ButterKnife
 import com.google.android.gms.location.LocationRequest
@@ -27,12 +29,14 @@ import timber.log.Timber.DebugTree
 import io.rapid.Rapid
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_sync_member.*
 
-class MainActivity : FragmentActivity(), OnMapReadyCallback {
+class MainActivity : FragmentActivity(), OnMapReadyCallback, GoogleMap.OnMapClickListener {
+
+    @BindView(R.id.button6) lateinit var rallyPointButton: Button
 
     var rxLocation: RxLocation? = null
     var documentId: String = "no_phone"
+    var settingRallyPoint = false
     lateinit var map: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +50,11 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         val mapFragment = fragmentManager
                 .findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync(this)
+        rallyPointButton.setOnClickListener {
+            Log.d("rally", "button pressed")
+            settingRallyPoint = true
+        }
+
     }
 
     override fun onStop() {
@@ -63,7 +72,15 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
                 .onError { error -> error.printStackTrace() }
     }
 
-    fun subscribeToRapid() {
+
+    fun addRallyPoint(loc: LatLng) {
+        Rapid.getInstance().collection<LocationEntity>("rallyPoints", LocationEntity::class.java).document(documentId)
+                .mutate(LocationEntity(documentId, loc.longitude, loc.latitude))
+                .onSuccess { Log.d("rapidio rallyPoint", "Success") }
+                .onError { error -> error.printStackTrace() }
+    }
+
+    fun subscribeToLocations() {
         Rapid.getInstance().collection("userLocations")
                 .subscribe({ test ->
                     Log.d("rapid subscribe", "response gotten")
@@ -79,6 +96,27 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
                                             location.body["longitude"] as Double))
                                     .title(location.id)
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.check)))
+                        }
+                    }
+                })
+    }
+
+    fun subscribeToRallyPoints() {
+        Rapid.getInstance().collection("rallyPoints")
+                .subscribe({ test ->
+                    Log.d("rapid subscribe", "response gotten")
+                    map.clear()
+                    test.forEach { location ->
+                        Log.d("rapid subscribe", "testing location object")
+                        Log.d("rapid subscribe", location.body.toString())
+                        if (location.body.containsKey("latitude") && location.body.containsKey("longitude")) {
+                            Log.d("rapid subscribe", "object is good")
+                            map.addMarker(MarkerOptions()
+                                    .position(LatLng(
+                                            location.body["latitude"] as Double,
+                                            location.body["longitude"] as Double))
+                                    .title(location.id)
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)))
                         }
                     }
                 })
@@ -113,7 +151,8 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         @SuppressLint("HardwareIds")
         documentId = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).deviceId ?: "no_phone"
         addCollectionNameToRapid()
-        subscribeToRapid()
+        subscribeToLocations()
+        subscribeToRallyPoints()
         val locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10000)
@@ -121,8 +160,8 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         rxLocation?.let {
             it.location().updates(locationRequest)
                     .subscribe(object : Observer<Location> {
-                        override fun onError(p0: Throwable) {
-                            Timber.d(p0)
+                        override fun onError(error: Throwable) {
+                            Timber.d(error)
                         }
 
                         override fun onComplete() {
@@ -131,9 +170,9 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
                         override fun onSubscribe(p0: Disposable) {
                         }
 
-                        override fun onNext(p0: Location) {
+                        override fun onNext(loc: Location) {
                             Log.d("locations", "ayyy")
-                            addLocation(p0)
+                            addLocation(loc)
                         }
                     })
         }
@@ -155,6 +194,15 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         this.map = map
+    }
+
+    override fun onMapClick(point: LatLng) {
+        Log.d("rally", "setting")
+        if (settingRallyPoint) {
+            Log.d("rally", "setting true")
+            addRallyPoint(point)
+            settingRallyPoint = false
+        }
     }
 
     companion object {
